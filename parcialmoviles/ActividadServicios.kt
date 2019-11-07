@@ -31,6 +31,8 @@ class ActividadServicios : AppCompatActivity(){
                 intentoMensajero = intent!!.getIntExtra("Mensajero", 0)
                 if (intentoMensajero == 1)
                     texto_intent_service.setText("Iteración: $enteroRecibido")
+                if (intentoMensajero == 2)
+                    texto_service.setText("Iteración: $enteroRecibido")
                 Log.d(TAG, "Finaliza recepción respuesta")
             }
         }
@@ -38,10 +40,19 @@ class ActividadServicios : AppCompatActivity(){
         Log.d(TAG,"El receptor fue registrado")
         boton_intent_service.setOnClickListener{
             var intentoActividad = Intent(this,EjemploIntentService::class.java)
-            val cantidadDeIteraciones = 3
+            val cantidadDeIteraciones = 10
             for (i in 0..cantidadDeIteraciones){
                 intentoActividad.putExtra("Iteracion",i)
                 Log.d(TAG,"Envio a IntentService")
+                startService(intentoActividad)
+            }
+        }
+        boton_service.setOnClickListener{
+            var intentoActividad = Intent(this,EjemploServicio::class.java)
+            val cantidadDeIteraciones = 10
+            for (i in 0..cantidadDeIteraciones){
+                intentoActividad.putExtra("Iteracion",i)
+                Log.d(TAG,"Envio a Service")
                 startService(intentoActividad)
             }
         }
