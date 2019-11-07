@@ -1,19 +1,40 @@
 package com.example.parcialmoviles
 
 import android.app.IntentService
-import android.content.BroadcastReceiver
-import android.content.Context
-import android.content.Intent
-import android.content.IntentFilter
+import android.content.*
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.os.IBinder
+import android.os.Message
+import android.os.Messenger
 import android.util.Log
+import android.view.View
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_actividad_servicios.*
 import java.nio.channels.InterruptedByTimeoutException
 
 class ActividadServicios : AppCompatActivity(){
 
     val TAG = "Actividad Servicios"
+
+    var servicioG : EjemploBoundService = EjemploBoundService()
+
+    var booleano:Boolean = false
+
+    val conexion : ServiceConnection = object : ServiceConnection{
+
+        override fun onServiceDisconnected(name: ComponentName?) {
+            booleano = false
+        }
+
+        override fun onServiceConnected(nombreClase:ComponentName,servicio: IBinder){
+            val vinculador : EjemploBoundService.vinculadorLocal = servicio as EjemploBoundService.vinculadorLocal
+            servicioG = vinculador.getServicio()
+            booleano = true
+
+        }
+
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -56,7 +77,32 @@ class ActividadServicios : AppCompatActivity(){
                 startService(intentoActividad)
             }
         }
+        boton_bound_service.setOnClickListener {
+            onButtonCLick(View(this))
+        }
     }
+
+    fun onButtonCLick(v:View){
+        if (booleano){
+            val numero : Int = servicioG.getRandom()
+            texto_bound.setText("El número fue: $numero")
+        }
+    }
+
+    override fun onStart() {
+        super.onStart()
+        var intencion :Intent = Intent(this, EjemploBoundService::class.java)
+        bindService(intencion,conexion,Context.BIND_AUTO_CREATE)
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (booleano){
+            unbindService(conexion)
+            booleano = false
+        }
+    }
+
 
 
 }
